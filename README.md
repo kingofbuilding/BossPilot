@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icons/icon128.png" width="88" height="88" alt="BossPilot Logo" />
+<img src="icons/logo.svg" width="92" height="92" alt="BossPilot Logo" />
 
 # BossPilot
 

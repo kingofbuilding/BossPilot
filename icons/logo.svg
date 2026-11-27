@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Primary vibrant teal-to-ocean gradient -->
+    <linearGradient id="bgGrad" x1="12" y1="8" x2="118" y2="122" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1BE7D6"/>
+      <stop offset="52%" stop-color="#00B0B9"/>
+      <stop offset="100%" stop-color="#0B5E8A"/>
+    </linearGradient>
+
+    <!-- Soft top-left glass specular highlight -->
+    <radialGradient id="topGlow" cx="28%" cy="18%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle bottom depth vignette -->
+    <radialGradient id="bottomShade" cx="80%" cy="88%" r="60%">
+      <stop offset="0%" stop-color="#052E4A" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#052E4A" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft drop shadow under the paper plane -->
+    <filter id="planeShadow" x="-15%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4.5" flood-color="#04374F" flood-opacity="0.32"/>
+    </filter>
+
+    <!-- Secondary wing gradient for crisp 3D fold -->
+    <linearGradient id="wingShade" x1="36" y1="68" x2="88" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D7FBFA"/>
+      <stop offset="100%" stop-color="#9BE9EE"/>
+    </linearGradient>
+
+    <!-- AI sparkle glow -->
+    <linearGradient id="sparkleGrad" x1="86" y1="22" x2="106" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#C8FFF9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded squircle base -->
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#bgGrad)"/>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#topGlow)"/>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#bottomShade)"/>
+
+  <!-- Crisp inner glass rim -->
+  <rect x="7.25" y="7.25" width="113.5" height="113.5" rx="26.75" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="2.5"/>
+
+  <!-- Minimalist autopilot paper-plane / chevron -->
+  <g filter="url(#planeShadow)">
+    <!-- Upper bright wing -->
+    <path d="M27 64.5 L94.5 34.5 C97.6 33.1 100.8 36.2 99.3 39.4 L69.8 101.2 C68.3 104.3 63.8 104.1 62.6 100.9 L53.4 76.2 L28.4 69.8 C25.2 69.0 24.4 65.7 27 64.5 Z" fill="#FFFFFF"/>
+    <!-- Folded inner wing for 3D depth -->
+    <path d="M97.4 36.4 L53.4 76.2 L62.6 100.9 C63.8 104.1 68.3 104.3 69.8 101.2 L99.3 39.4 C100.1 37.7 99.1 36.0 97.4 36.4 Z" fill="url(#wingShade)"/>
+    <!-- Crisp crease highlight -->
+    <path d="M53.4 76.2 L96.8 37.0" stroke="#008E9B" stroke-opacity="0.22" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Delicate 4-point AI sparkle star at upper-left/top accent -->
+  <path d="M40 24 C40.9 30.8 43.2 33.1 50 34 C43.2 34.9 40.9 37.2 40 44 C39.1 37.2 36.8 34.9 30 34 C36.8 33.1 39.1 30.8 40 24 Z" fill="url(#sparkleGrad)" opacity="0.96"/>
+  <circle cx="29" cy="46" r="2.6" fill="#FFFFFF" opacity="0.72"/>
+</svg>
