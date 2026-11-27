@@ -103,7 +103,9 @@ async function executeBatch(phase, task) {
     clearInterval(heartbeat);
     activeRun = null;
   }
-  if (state.aborted) log('已停止，保留审核列表和投递记录', 'warn');
+  if (state.aborted) {
+    log(result && phase === 'collecting' ? '已停止收集，已保留当前收集到的岗位，可直接审核并投递' : '已停止，保留审核列表和投递记录', 'warn');
+  }
   const completed = result && !state.aborted;
   const previousReview = state.screened?.length ? 'review' : 'idle';
   const latestProcessed = await processedJobs();

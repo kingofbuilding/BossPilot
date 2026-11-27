@@ -52,8 +52,9 @@ async function runCollect() {
   if (mode === 'internship') log('搜索链接已加入 BOSS 的「实习」条件，收录时仍核对标题和岗位方向。');
   progress(0, count, '合格岗位');
   try {
-    while (!verificationStopped && accepted.size < count && searches.some(search => !search.done)) {
+    while (!verificationStopped && !state.aborted && accepted.size < count && searches.some(search => !search.done)) {
       for (let idx = 0; idx < searches.length; idx++) {
+        if (state.aborted || verificationStopped) break;
         const search = searches[idx];
         if (search.done || accepted.size >= count) continue;
         // 动态顺延配额：如果前面的关键词没凑够，把剩余缺口直接均摊给后面还没跑的关键词，避免来回切页
@@ -67,10 +68,11 @@ async function runCollect() {
           search.urls.clear();
           search.fingerprints.clear();
           await humanPause(pace.kwMin, pace.kwMax);
+          if (state.aborted) break;
         }
-        while (!verificationStopped && !search.done && accepted.size < count && search.retained < search.quota) {
+        while (!verificationStopped && !state.aborted && !search.done && accepted.size < count && search.retained < search.quota) {
           await waitIfPaused();
-          if (state.aborted) return;
+          if (state.aborted) break;
           const { keyword, query } = search;
           try {
             if (!search.queryPages && !search.retries) {
@@ -81,12 +83,13 @@ async function runCollect() {
               currentTabOwner = search;
               if (!(await waitTabComplete(sharedTab.id))) throw new Error('打开搜索页超时');
               await humanPause(2000, 3600);
+              if (state.aborted) break;
               await ensurePageScript(sharedTab.id, 'search');
             } else if (!search.needsRead) {
               await humanPause(pace.pageMin, pace.pageMax);
-              if (state.aborted) return;
+              if (state.aborted) break;
               let next = await sendToTab(sharedTab.id, { type: 'NEXT_RESULTS', keyword: query, visited: [...search.visited], retry: search.retries });
-              if (state.aborted) return;
+              if (state.aborted) break;
               if (next.blocked) {
                 await stopAtVerification(sharedTab.id, next.error);
                 sharedTab = null;
@@ -133,7 +136,7 @@ async function runCollect() {
               break;
             }
             if (!response.success) throw new Error(response.error);
-            if (state.aborted) return;
+            if (state.aborted) break;
             const resultUrl = await curUrl(sharedTab.id);
             if (mode === 'internship') {
               const actualQuery = new URL(resultUrl).searchParams.get('query');
@@ -225,7 +228,7 @@ async function runCollect() {
           }
         }
       }
-      if (!verificationStopped && accepted.size < count) {
+      if (!verificationStopped && !state.aborted && accepted.size < count) {
         const remaining = searches.filter(s => !s.done);
         if (remaining.length) {
           const boost = Math.max(1, Math.ceil((count - accepted.size) / remaining.length));
@@ -236,7 +239,7 @@ async function runCollect() {
   } finally {
     if (sharedTab) await chrome.tabs.remove(sharedTab.id).catch(() => {});
   }
-  if (state.aborted) return;
+  if (state.aborted && accepted.size === 0 && rejected.size === 0) return false;
   for (const search of searches) {
     log('「' + search.keyword + '」共读 ' + search.pages + ' 批、' + search.checkedKeys.size + ' 个不同岗位，贡献 ' +
       search.retained + ' 个合格岗位。');
@@ -244,8 +247,9 @@ async function runCollect() {
   const screened = [...accepted.values(), ...rejected.values()];
   await chrome.storage.local.set({ sw_screened: screened });
   state.screened = screened;
-  log((verificationStopped ? '验证中止，已保留：' : '筛选完成：') + accepted.size + '/' + count + ' 个合格岗位，保留 ' + rejected.size + ' 个排除示例。',
-    accepted.size >= count ? 'success' : 'warn');
+  const prefix = verificationStopped ? '验证中止，已保留：' : state.aborted ? '已手动停止，已保留：' : '筛选完成：';
+  log(prefix + accepted.size + '/' + count + ' 个合格岗位，保留 ' + rejected.size + ' 个排除示例。',
+    accepted.size > 0 ? 'success' : 'warn');
   return true;
 }
 
